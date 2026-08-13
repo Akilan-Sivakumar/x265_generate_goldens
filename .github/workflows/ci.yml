@@ -10,7 +10,7 @@ on:
       commit_sha:
         description: "x265 commit SHA to build and generate goldens from"
         required: true
-        default: "6fabdd5744a818d0caa7557d21a20b2458ec3dd"
+        default: "6fabdd5744a818d0caa7557d21a20b2458ec3ddf"
       platforms:
         description: "Which platform(s) to regenerate"
         required: true
