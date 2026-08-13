@@ -14,7 +14,7 @@ on:
       commit_sha:
         description: "x265 commit SHA to build and generate goldens from"
         required: true
-        default: "6fabdd5744a818d0caa7557d21a20b2458ec3dd"
+        default: "6fabdd5744a818d0caa7557d21a20b2458ec3ddf"
       platforms:
         description: "Which platform(s) to regenerate"
         required: true
@@ -610,7 +610,7 @@ jobs:
             dest="$HARNESS_DIR/x265/$folder/default"
             mkdir -p "$dest"
             echo "=== Downloading $artifact for build $build ==="
-            gh run download --name "$artifact" --dir "prebuilt/$build" || \
+            gh run download "${{ github.run_id }}" \   --repo "${{ github.repository }}" \   --name "$artifact" \   --dir "prebuilt/$build" || \
               (echo "::error::could not fetch $artifact" && exit 1)
             cp "prebuilt/$build/x265" "$dest/x265"
             chmod +x "$dest/x265"
@@ -795,7 +795,7 @@ jobs:
             dest="$HARNESS_DIR/x265/$build/default/$target"
             mkdir -p "$dest"
             echo "=== Downloading $artifact for build $build ==="
-            gh run download --name "$artifact" --dir "prebuilt/$build"
+            gh run download "${{ github.run_id }}" \   --repo "${{ github.repository }}" \   --name "$artifact" \   --dir "prebuilt/$build"
             cp "prebuilt/$build/x265.exe" "$dest/x265.exe"
             [ -f "prebuilt/$build/libx265.dll" ] && cp "prebuilt/$build/libx265.dll" "$dest/libx265.dll"
 
