@@ -113,6 +113,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          repository: Multicorewareinc/x265
           ref: ${{ env.X265_COMMIT }}
           fetch-depth: 0
           persist-credentials: false
@@ -225,6 +226,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          repository: Multicorewareinc/x265
           ref: ${{ env.X265_COMMIT }}
           fetch-depth: 0
           persist-credentials: false
@@ -298,6 +300,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          repository: Multicorewareinc/x265
           ref: ${{ env.X265_COMMIT }}
           fetch-depth: 0
           persist-credentials: false
@@ -429,6 +432,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          repository: Multicorewareinc/x265
           ref: ${{ env.X265_COMMIT }}
           fetch-depth: 0
           persist-credentials: false
