@@ -82,31 +82,48 @@ jobs:
             -pix_fmt yuv420p clips/tiny_64x64.yuv -y
 
       # ---- Encode with each asm path on both binaries, then diff ----
+      # NOTE: no `set -e` here on purpose. x265 CLI encode calls can fail
+      # (bad args, unsupported combo, etc.) and we want to SEE that failure
+      # and its log, not have the whole job die silently on the spot.
       - name: Encode and compare (per asm path, per clip, per preset)
         run: |
-          set -e
           BASE_BIN=./base-build/x265
           PR_BIN=./pr-build/x265
           FAIL=0
 
-          for clip in clips/*.yuv; do
-            name=$(basename "$clip" .yuv)
-            res="${name##*_}"
-            width="${res%x*}"
-            height="${res#*x}"
+          # "0" disables all SIMD detection in x265 (pure C fallback).
+          # The literal string "none" is NOT a valid --asm value and will
+          # cause x265 to exit non-zero.
+          for asm in ${{ matrix.asm_flags }} "0"; do
+            for clip in clips/*.yuv; do
+              name=$(basename "$clip" .yuv)
+              res="${name##*_}"
+              width="${res%x*}"
+              height="${res#*x}"
 
-            for asm in ${{ matrix.asm_flags }} "none"; do
               for preset in ultrafast medium veryslow; do
                 out_base="out_${name}_${asm}_${preset}_base.hevc"
                 out_pr="out_${name}_${asm}_${preset}_pr.hevc"
+                log_base="log_${name}_${asm}_${preset}_base.txt"
+                log_pr="log_${name}_${asm}_${preset}_pr.txt"
 
                 $BASE_BIN --input "$clip" --input-res "${width}x${height}" \
                   --fps 25 --preset "$preset" --asm "$asm" \
-                  -o "$out_base" > "log_${name}_${asm}_${preset}_base.txt" 2>&1
+                  -o "$out_base" > "$log_base" 2>&1
+                base_rc=$?
 
                 $PR_BIN --input "$clip" --input-res "${width}x${height}" \
                   --fps 25 --preset "$preset" --asm "$asm" \
-                  -o "$out_pr" > "log_${name}_${asm}_${preset}_pr.txt" 2>&1
+                  -o "$out_pr" > "$log_pr" 2>&1
+                pr_rc=$?
+
+                if [ "$base_rc" -ne 0 ] || [ "$pr_rc" -ne 0 ]; then
+                  echo "::error::ENCODE FAILED clip=$name asm=$asm preset=$preset base_rc=$base_rc pr_rc=$pr_rc"
+                  echo "---- base log ($log_base) ----"; cat "$log_base"
+                  echo "---- pr log ($log_pr) ----"; cat "$log_pr"
+                  FAIL=1
+                  continue
+                fi
 
                 base_sum=$(sha256sum "$out_base" | awk '{print $1}')
                 pr_sum=$(sha256sum "$out_pr" | awk '{print $1}')
@@ -122,7 +139,7 @@ jobs:
           done
 
           if [ "$FAIL" -ne 0 ]; then
-            echo "One or more asm/preset/clip combinations produced different output."
+            echo "One or more asm/preset/clip combinations failed or produced different output."
             exit 1
           fi
           echo "All combinations bitexact between ${{ github.event.inputs.base_ref }} and PR #${{ github.event.inputs.pr_number }} on ${{ matrix.arch }}."
