@@ -112,7 +112,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-linux:
     name: "Build Linux (${{ matrix.variant }}, ${{ matrix.config }})"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
 
     strategy:
@@ -195,6 +195,7 @@ jobs:
             -DENABLE_SHARED=OFF \
             -DENABLE_CLI=ON \
             -DENABLE_ASSEMBLY=ON \
+            -DCHECKED_BUILD=ON \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
@@ -219,6 +220,7 @@ jobs:
             -DENABLE_SHARED=OFF \
             -DENABLE_CLI=ON \
             -DENABLE_ASSEMBLY=ON \
+            -DCHECKED_BUILD=ON \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
@@ -244,6 +246,7 @@ jobs:
             -DENABLE_SHARED=OFF \
             -DENABLE_CLI=ON \
             -DENABLE_ASSEMBLY=ON \
+            -DCHECKED_BUILD=ON \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
@@ -270,6 +273,7 @@ jobs:
             -DENABLE_CLI=OFF \
             -DEXPORT_C_API=OFF \
             -DENABLE_ASSEMBLY=ON \
+            -DCHECKED_BUILD=ON \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
@@ -292,6 +296,7 @@ jobs:
             -DENABLE_CLI=OFF \
             -DEXPORT_C_API=OFF \
             -DENABLE_ASSEMBLY=ON \
+            -DCHECKED_BUILD=ON \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
@@ -343,7 +348,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-linux-multilib:
     name: "Build Linux (multilib, linked)"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
 
     needs: build-linux
@@ -405,6 +410,7 @@ jobs:
             -DENABLE_SHARED=ON \
             -DENABLE_CLI=ON \
             -DENABLE_ASSEMBLY=ON \
+            -DCHECKED_BUILD=ON \
             -DEXTRA_LIB="x265_main10.a;x265_main12.a" \
             -DEXTRA_LINK_FLAGS="-L." \
             -DLINKED_10BIT=ON \
@@ -432,7 +438,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-windows:
     name: "Build Windows (${{ matrix.variant }}, ${{ matrix.config }})"
-    runs-on: windows-2025
+    runs-on: windows-latest
     timeout-minutes: 60
 
     env:
@@ -545,7 +551,7 @@ jobs:
 
           $vcvars = "$vsPath\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\8bit -DENABLE_SHARED=OFF -DENABLE_CLI=ON -DENABLE_ASSEMBLY=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\8bit --config ${{ matrix.config }} -j"
+          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\8bit -DENABLE_SHARED=OFF -DENABLE_CLI=ON -DENABLE_ASSEMBLY=ON -DCHECKED_BUILD=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\8bit --config ${{ matrix.config }} -j"
 
           & "build\8bit\${{ matrix.config }}\x265.exe" --version
 
@@ -561,7 +567,7 @@ jobs:
 
           $vcvars = "$vsPath\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\10bit -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=OFF -DENABLE_CLI=ON -DENABLE_ASSEMBLY=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\10bit --config ${{ matrix.config }} -j"
+          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\10bit -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=OFF -DENABLE_CLI=ON -DENABLE_ASSEMBLY=ON -DCHECKED_BUILD=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\10bit --config ${{ matrix.config }} -j"
 
           & "build\10bit\${{ matrix.config }}\x265.exe" --version
 
@@ -577,7 +583,7 @@ jobs:
 
           $vcvars = "$vsPath\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\12bit -DHIGH_BIT_DEPTH=ON -DMAIN12=ON -DENABLE_SHARED=OFF -DENABLE_CLI=ON -DENABLE_ASSEMBLY=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\12bit --config ${{ matrix.config }} -j"
+          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\12bit -DHIGH_BIT_DEPTH=ON -DMAIN12=ON -DENABLE_SHARED=OFF -DENABLE_CLI=ON -DENABLE_ASSEMBLY=ON -DCHECKED_BUILD=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\12bit --config ${{ matrix.config }} -j"
 
           & "build\12bit\${{ matrix.config }}\x265.exe" --version
 
@@ -593,7 +599,7 @@ jobs:
 
           $vcvars = "$vsPath\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\multilib\12bit -DCMAKE_BUILD_TYPE=Release -DHIGH_BIT_DEPTH=ON -DMAIN12=ON -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXPORT_C_API=OFF -DENABLE_ASSEMBLY=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\multilib\12bit --config Release -j"
+          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\multilib\12bit -DCMAKE_BUILD_TYPE=Release -DHIGH_BIT_DEPTH=ON -DMAIN12=ON -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXPORT_C_API=OFF -DENABLE_ASSEMBLY=ON -DCHECKED_BUILD=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\multilib\12bit --config Release -j"
 
       - name: Build multilib 10-bit component
         if: matrix.variant == 'multilib-10bit-component'
@@ -607,7 +613,7 @@ jobs:
 
           $vcvars = "$vsPath\VC\Auxiliary\Build\vcvars64.bat"
 
-          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\multilib\10bit -DCMAKE_BUILD_TYPE=Release -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXPORT_C_API=OFF -DENABLE_ASSEMBLY=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\multilib\10bit --config Release -j"
+          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\multilib\10bit -DCMAKE_BUILD_TYPE=Release -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXPORT_C_API=OFF -DENABLE_ASSEMBLY=ON -DCHECKED_BUILD=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\multilib\10bit --config Release -j"
 
       - name: Upload 8-bit artifact
         if: matrix.variant == '8bit'
@@ -655,7 +661,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-windows-multilib:
     name: "Build Windows (multilib, linked)"
-    runs-on: windows-2025
+    runs-on: windows-latest
     timeout-minutes: 60
 
     needs: build-windows
@@ -760,7 +766,7 @@ jobs:
           set(LINKED_12BIT ON CACHE BOOL "" FORCE)
           "@ | Set-Content $cacheFile
 
-          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\multilib\8bit -C build\multilib\8bit\init.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_SHARED=ON -DENABLE_CLI=ON -DENABLE_ASSEMBLY=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\multilib\8bit --config Release -j"
+          cmd /c "`"$vcvars`" && set PATH=$nasmPath;%PATH% && cmake -S source -B build\multilib\8bit -C build\multilib\8bit\init.cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_SHARED=ON -DENABLE_CLI=ON -DENABLE_ASSEMBLY=ON -DCHECKED_BUILD=ON -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache && cmake --build build\multilib\8bit --config Release -j"
 
           & "build\multilib\8bit\Release\x265.exe" --version
 
@@ -779,7 +785,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   generate-goldens-linux:
     name: "Generate Goldens - Linux"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     if: ${{ github.event.inputs.platforms == 'both' || github.event.inputs.platforms == 'linux' }}
 
@@ -801,6 +807,18 @@ jobs:
       SMOKE_TESTS_FILE: ${{ github.workspace }}/smoke-tests.txt
 
     steps:
+
+      # Goldens must come from the same runner size as the main CI smoke
+      # jobs (4 vCPU on public repos). x265 derives its thread pool and
+      # frame-threads from the CPU count, which changes VBV/ABR output.
+      - name: Verify runner CPU count matches main CI
+        run: |
+          CPUS=$(nproc)
+          echo "Runner CPUs: $CPUS"
+          if [ "$CPUS" -ne 4 ]; then
+            echo "::error::Expected 4 CPUs (same as main CI smoke runners), got $CPUS. Run this workflow in the same public repo as github-ci.yml."
+            exit 1
+          fi
 
       - name: Validate commit SHA
         run: |
@@ -1111,7 +1129,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   generate-goldens-windows:
     name: "Generate Goldens - Windows"
-    runs-on: windows-2025
+    runs-on: windows-2022
 
     if: ${{ github.event.inputs.platforms == 'both' || github.event.inputs.platforms == 'windows' }}
 
@@ -1137,6 +1155,18 @@ jobs:
       SMOKE_TESTS_FILE: ${{ github.workspace }}\smoke-tests.txt
 
     steps:
+
+      # Goldens must come from the same runner size as the main CI smoke
+      # jobs (4 vCPU on public repos). x265 derives its thread pool and
+      # frame-threads from the CPU count, which changes VBV/ABR output.
+      - name: Verify runner CPU count matches main CI
+        run: |
+          CPUS=$(nproc)
+          echo "Runner CPUs: $CPUS"
+          if [ "$CPUS" -ne 4 ]; then
+            echo "::error::Expected 4 CPUs (same as main CI smoke runners), got $CPUS. Run this workflow in the same public repo as github-ci.yml."
+            exit 1
+          fi
 
       - name: Validate commit SHA
         run: |
