@@ -1061,7 +1061,6 @@ jobs:
 
               python3 smoke-test.py \
                 -b "$build" \
-                -t "$SMOKE_TESTS_FILE" \
                 --no-make \
                 --no-bench
             ) || {
@@ -1490,7 +1489,6 @@ jobs:
 
               python3 smoke-test.py \
                 -b "$build" \
-                -t "$WIN_SMOKE_TESTS_FILE" \
                 --no-make \
                 --no-bench
             ) || {
