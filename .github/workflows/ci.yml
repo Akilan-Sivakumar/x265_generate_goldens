@@ -42,7 +42,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   prep-assets:
     name: "Prepare Assets (no goldens)"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     permissions:
@@ -112,7 +112,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-linux:
     name: "Build Linux (${{ matrix.variant }}, ${{ matrix.config }})"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     strategy:
@@ -343,7 +343,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-linux-multilib:
     name: "Build Linux (multilib, linked)"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     needs: build-linux
@@ -432,7 +432,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-windows:
     name: "Build Windows (${{ matrix.variant }}, ${{ matrix.config }})"
-    runs-on: windows-latest
+    runs-on: windows-2025
     timeout-minutes: 60
 
     env:
@@ -655,7 +655,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-windows-multilib:
     name: "Build Windows (multilib, linked)"
-    runs-on: windows-latest
+    runs-on: windows-2025
     timeout-minutes: 60
 
     needs: build-windows
@@ -779,7 +779,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   generate-goldens-linux:
     name: "Generate Goldens - Linux"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     if: ${{ github.event.inputs.platforms == 'both' || github.event.inputs.platforms == 'linux' }}
 
@@ -1111,7 +1111,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   generate-goldens-windows:
     name: "Generate Goldens - Windows"
-    runs-on: windows-2022
+    runs-on: windows-2025
 
     if: ${{ github.event.inputs.platforms == 'both' || github.event.inputs.platforms == 'windows' }}
 
