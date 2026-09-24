@@ -112,7 +112,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-linux:
     name: "Build Linux (${{ matrix.variant }}, ${{ matrix.config }})"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     strategy:
@@ -348,7 +348,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-linux-multilib:
     name: "Build Linux (multilib, linked)"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     needs: build-linux
@@ -438,7 +438,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-windows:
     name: "Build Windows (${{ matrix.variant }}, ${{ matrix.config }})"
-    runs-on: windows-latest
+    runs-on: windows-2025
     timeout-minutes: 60
 
     env:
@@ -661,7 +661,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   build-windows-multilib:
     name: "Build Windows (multilib, linked)"
-    runs-on: windows-latest
+    runs-on: windows-2025
     timeout-minutes: 60
 
     needs: build-windows
@@ -785,7 +785,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   generate-goldens-linux:
     name: "Generate Goldens - Linux"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     if: ${{ github.event.inputs.platforms == 'both' || github.event.inputs.platforms == 'linux' }}
 
@@ -1129,7 +1129,7 @@ jobs:
   # ───────────────────────────────────────────────────────────────────────
   generate-goldens-windows:
     name: "Generate Goldens - Windows"
-    runs-on: windows-2022
+    runs-on: windows-2025
 
     if: ${{ github.event.inputs.platforms == 'both' || github.event.inputs.platforms == 'windows' }}
 
@@ -1268,25 +1268,6 @@ jobs:
             "conf.tar.gz" \
             "/tmp/conf"
 
-      - name: Find vcvarsall.bat
-        run: |
-          set -euo pipefail
-
-          VCVARS=$(find \
-            "C:/Program Files/Microsoft Visual Studio" \
-            -name "vcvarsall.bat" \
-            2>/dev/null \
-            | head -1)
-
-          if [ -z "$VCVARS" ]; then
-            echo "::error::Could not find vcvarsall.bat"
-            exit 1
-          fi
-
-          echo "VCVARSALL_PATH=$(cygpath -m "$VCVARS")" >> "$GITHUB_ENV"
-
-          echo "[OK] VCVARSALL_PATH=$VCVARS"
-
       - name: Configure conf.py
         run: |
           set -euo pipefail
@@ -1305,27 +1286,6 @@ jobs:
           WIN_DECODER_PATH=$(cygpath -m "$DECODER_PATH")
           WIN_TEMP_DIR=$(cygpath -m "$TEMP_DIR")
           WIN_COREDUMP_DIR=$(cygpath -m "$COREDUMP_DIR")
-
-          python3 - << 'EOF'
-          import os
-          import re
-
-          conf = os.environ["HARNESS_DIR"].replace("\\", "/") + "/conf.py"
-          vcvars = os.environ["VCVARSALL_PATH"]
-
-          with open(conf, "r", encoding="utf-8") as f:
-              content = f.read()
-
-          content = re.sub(
-              r"^(?!#)\s*my_vcvarsall\s*=.*$",
-              f"my_vcvarsall         = r'{vcvars}'",
-              content,
-              flags=re.MULTILINE,
-          )
-
-          with open(conf, "w", encoding="utf-8") as f:
-              f.write(content)
-          EOF
 
           sed -i \
             "s|my_source.*=.*|my_source            = r'${WIN_X265_DIR}/source/'|" \
@@ -1370,51 +1330,6 @@ jobs:
           sed -i \
             "s|my_coredumppath.*=.*|my_coredumppath      = r'${WIN_COREDUMP_DIR}/'|" \
             "$HARNESS_DIR/conf.py"
-
-      - name: Patch utils.py vcpath and msbuild
-        run: |
-          set -euo pipefail
-
-          python3 - << 'EOF'
-          import os
-
-          utils = (
-              os.environ["HARNESS_DIR"]
-              .replace("\\", "/")
-              + "/utils.py"
-          )
-
-          vcvars_dir = os.path.dirname(
-              os.environ["VCVARSALL_PATH"]
-          )
-
-          vs_root = (
-              vcvars_dir
-              .replace("/", "\\")
-              .split("VC\\Auxiliary\\Build")[0]
-          )
-
-          msbuild = (
-              vs_root
-              + r"MSBuild\Current\Bin\amd64\MSBuild.exe"
-          )
-
-          with open(utils, "r", encoding="utf-8") as f:
-              content = f.read()
-
-          content = content.replace(
-              r"vcpath = r'C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build'",
-              f"vcpath = r'{vcvars_dir}'",
-          )
-
-          content = content.replace(
-              r"r'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\amd64\MSBuild.exe'",
-              f"r'{msbuild}'",
-          )
-
-          with open(utils, "w", encoding="utf-8") as f:
-              f.write(content)
-          EOF
 
       - name: Install dependencies
         run: |
