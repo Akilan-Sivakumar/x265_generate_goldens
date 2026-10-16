@@ -116,7 +116,7 @@ jobs:
       - name: Checkout x265
         uses: actions/checkout@v6
         with:
-          repository: Multicorewareinc/x265
+          repository: Akilan-Sivakumar/x265_public
           ref: ${{ env.X265_COMMIT }}
           fetch-depth: 0
           persist-credentials: false
@@ -335,7 +335,7 @@ jobs:
       - name: Checkout x265
         uses: actions/checkout@v6
         with:
-          repository: Multicorewareinc/x265
+          repository: Akilan-Sivakumar/x265_public
           ref: ${{ env.X265_COMMIT }}
           fetch-depth: 0
           persist-credentials: false
@@ -446,7 +446,7 @@ jobs:
       - name: Checkout x265
         uses: actions/checkout@v6
         with:
-          repository: Multicorewareinc/x265
+          repository: Akilan-Sivakumar/x265_public
           ref: ${{ env.X265_COMMIT }}
           fetch-depth: 0
           persist-credentials: false
@@ -652,7 +652,7 @@ jobs:
       - name: Checkout x265
         uses: actions/checkout@v6
         with:
-          repository: Multicorewareinc/x265
+          repository: Akilan-Sivakumar/x265_public
           ref: ${{ env.X265_COMMIT }}
           fetch-depth: 0
           persist-credentials: false
@@ -835,7 +835,7 @@ jobs:
           set -euo pipefail
 
           git clone \
-            https://github.com/Multicorewareinc/x265.git \
+            https://github.com/Akilan-Sivakumar/x265_public.git \
             "$X265_DIR"
 
           git -C "$X265_DIR" fetch origin "$X265_COMMIT"
@@ -1183,7 +1183,7 @@ jobs:
           set -euo pipefail
 
           git clone \
-            https://github.com/Multicorewareinc/x265.git \
+            https://github.com/Akilan-Sivakumar/x265_public.git \
             "$X265_DIR"
 
           git -C "$X265_DIR" fetch origin "$X265_COMMIT"
