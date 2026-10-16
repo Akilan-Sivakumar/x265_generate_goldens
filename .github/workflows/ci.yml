@@ -58,7 +58,7 @@ jobs:
           mkdir -p assets
           BASE_URL="https://github.com/${ASSETS_REPO}/releases/latest/download"
   
-          for f in videos.tar.gz decoders-linux.tar.gz decoders-windows.tar.gz conf.tar.gz; do
+          for f in videos.tar.gz decoders-linux.tar.gz decoders-windows.tar.gz conf.tar.gz smoke-tests.tar.gz; do
             echo "=== Downloading $f ==="
             curl -fSL --retry 5 --retry-delay 5 --retry-all-errors -C - \
               -o "assets/$f" "$BASE_URL/$f"
