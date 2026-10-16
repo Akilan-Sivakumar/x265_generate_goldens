@@ -44,61 +44,38 @@ jobs:
     name: "Prepare Assets (no goldens)"
     runs-on: ubuntu-24.04
     timeout-minutes: 20
-
+  
     permissions:
       contents: read
-      id-token: write
-
+  
+    env:
+      ASSETS_REPO: "Akilan-Sivakumar/x265_CI_test_assets"
+  
     steps:
-
-      - name: Azure login (OIDC)
-        uses: azure/login@v3.0.1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          allow-no-subscriptions: true
-
-      - name: Download smoke assets (excluding goldens)
-        env:
-          ONEDRIVE_USER: ${{ secrets.ONEDRIVE_USER }}
-          ONEDRIVE_FILE_PATH: ${{ secrets.ONEDRIVE_FILE_PATH }}
+      - name: "Download smoke assets from release (excluding goldens)"
         run: |
           set -euo pipefail
-
           mkdir -p assets
-
-          TOKEN=$(az account get-access-token \
-            --resource https://graph.microsoft.com \
-            --query accessToken \
-            -o tsv)
-
-          if [ -z "$TOKEN" ]; then
-            echo "::error::Failed to obtain Graph API token"
-            exit 1
-          fi
-
-          download_asset() {
-            local filename="$1"
-
-            echo "=== Downloading $filename ==="
-
-            curl -sfL \
-              -H "Authorization: Bearer ${TOKEN}" \
-              "https://graph.microsoft.com/v1.0/users/${ONEDRIVE_USER}/drive/root:/${ONEDRIVE_FILE_PATH}/${filename}:/content" \
-              -o "assets/$filename"
-
-            echo "[OK] $filename downloaded"
-          }
-
-          download_asset "videos.tar.gz"
-          download_asset "decoders-linux.tar.gz"
-          download_asset "decoders-windows.tar.gz"
-          download_asset "conf.tar.gz"
-          download_asset "smoke-tests.tar.gz"
-
+          BASE_URL="https://github.com/${ASSETS_REPO}/releases/latest/download"
+  
+          for f in videos.tar.gz decoders-linux.tar.gz decoders-windows.tar.gz conf.tar.gz; do
+            echo "=== Downloading $f ==="
+            curl -fSL --retry 5 --retry-delay 5 --retry-all-errors -C - \
+              -o "assets/$f" "$BASE_URL/$f"
+            echo "[OK] $f downloaded"
+          done
+  
           echo "[INFO] Skipped goldens-linux.tar.gz / goldens-windows.tar.gz"
           echo "[INFO] Golden directory will start empty."
-
+  
+      - name: "Validate archive integrity"
+        run: |
+          set -euo pipefail
+          for f in assets/*.tar.gz; do
+            gzip -t "$f"
+          done
+          ls -lh assets/
+  
       - name: Upload assets artifact
         uses: actions/upload-artifact@v7
         with:
